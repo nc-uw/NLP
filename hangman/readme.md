@@ -1,4 +1,4 @@
-##Results
+## Results
 
 Running `python3 playHangman.py` will yield the following - 
 
