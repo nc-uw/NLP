@@ -1,3 +1,3 @@
 Results
 
-![Image of Results](https://github.com/nc-uw/NLP/hangman/hangmanResults.png)
+![Image of Results](https://github.com/nc-uw/NLP/blob/master/hangman/hangmanResults.png)
