@@ -17,25 +17,29 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import math
 
-print ('\n..reading csv file "words_250000_train.txt" as dataframe')
-df = pd.read_csv("words_250000_train.txt", header=None)
-print ('\n..df top5 obs..', df.head(5))
-print ('\n..df bottom5 obs..', df.tail(5))
-words = df.values
+# read file
+def readFile(name):
+    print ('\n..reading csv file "{}" as dataframe'.format(name))
+    df = pd.read_csv("words_250000_train.txt", header=None)
+    print ('\n..df top5 obs..', df.head(5))
+    print ('\n..df bottom5 obs..', df.tail(5))
+    words = df.values
+    return words
 
-words_train, words_test = train_test_split(words, test_size=0.3, random_state=7)
+# train-test split
+def split(words):
+    words_train, words_test = train_test_split(words, test_size=0.3, random_state=7)
 
-df_train = pd.DataFrame(words_train)
-df_train.to_csv('words_train.txt', index=None, header=None)
+    df_train = pd.DataFrame(words_train)
+    df_train.to_csv('words_train.txt', index=None, header=None)
 
-df_test = pd.DataFrame(words_test)
-df_test.to_csv('words_test.txt', index=None, header=None)
-df_train.head(50).to_csv('words_top50.txt', index=None, header=None)
+    df_test = pd.DataFrame(words_test)
+    df_test.to_csv('words_test.txt', index=None, header=None)
+    df_train.head(50).to_csv('words_top50.txt', index=None, header=None)
 
 #function that stores n-gram counts based on training data .. 
 # .. where n is user-specified by parameter N
 def train(ffile, N):
-    
     count = 0
     f = open(ffile)
     
@@ -73,10 +77,8 @@ def train(ffile, N):
     print (count, ' words trained..\n')
     return model
 
-
+# intitial play based on top5 unigram count in dictionary
 def initial_eval(guesses, model):
-    
-    #based on top5 unigram count in dictionary
     alphabets, count = zip(*list(model['1_gram'].items()))
     alphabets = np.array(alphabets)
     count = np.array(count)
@@ -85,10 +87,8 @@ def initial_eval(guesses, model):
     for o in options:
         if o not in guesses:
             return o
-        
-
+# play based on Ngram evaluations        
 def ngram_eval(current, guesses, model, N):
-    
     ngram_prob = {}    
     for n in range(2,N+1):
         prob = np.zeros(27)
@@ -125,7 +125,7 @@ def interpolation(ngram_prob):
     pred = ascii_lowercase[np.where(interp_prob == max_prob)[0][0]]
     return pred
 
-
+# play
 def play_hangman(model, word, N):  
     
     incorrect = 0
@@ -158,7 +158,6 @@ def play_hangman(model, word, N):
     
     return current, guesses
 
-
 #check accuracy on train and test set
 def accuracy(model, ffile, N):
     f = open(ffile)
@@ -173,15 +172,20 @@ def accuracy(model, ffile, N):
             correct += 1
             #print (correct)    
     print ('..accuracy % - ', float(correct/count))
-    
-# initialize model
-N=6
-model = train("words_train.txt", N)
 
-# check accuracy
-print ('\n..top50 performance stats')
-accuracy(model, "words_top50.txt", N)
-print ('\n..test performance stats')
-accuracy(model, "words_test.txt", N)
-print ('\n..train performance stats')
-accuracy(model, "words_train.txt", N)
+
+if __name__ == "__main__":
+    # read data "words_250000_train.txt"
+    words = readFile('words_250000_train.txt')
+    split(words)
+    # initialize model
+    N=6
+    model = train("words_train.txt", N)
+
+    # check accuracy
+    print ('\n..top50 performance stats')
+    accuracy(model, "words_top50.txt", N)
+    print ('\n..test performance stats')
+    accuracy(model, "words_test.txt", N)
+    print ('\n..train performance stats')
+    accuracy(model, "words_train.txt", N)
